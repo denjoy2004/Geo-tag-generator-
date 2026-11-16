@@ -67,7 +67,7 @@ $('loc').onclick=()=>{const msg=$('locmsg');
   $('lat').value=la.toFixed(6);$('lng').value=lo.toFixed(6);
   const d=new Date();$('dt').value=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
   const off=-d.getTimezoneOffset(),sg=off>=0?'+':'-';$('tz').value=sg+pad(Math.floor(Math.abs(off)/60))+':'+pad(Math.abs(off)%60);
-  try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat='+la+'&lon='+lo);const j=await r.json();
+  try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=en&addressdetails=1&lat='+la+'&lon='+lo);const j=await r.json();
    if(j&&j.address){pick({...j,lat:la,lon:lo});msg.textContent='Location, date and time updated. Check the place name and edit if needed.';return}}catch(e){}
   msg.textContent='Coordinates, date and time updated, but the place name could not be fetched. Type it in or use Search.';render()},
  err=>{if(!window.isSecureContext){msg.textContent='Your browser blocks location for files opened from WhatsApp or Files. Host this page on https (GitHub Pages or Netlify) to use this button, or type the latitude and longitude below.';return}msg.textContent=err.code===1?'Permission denied. Allow location access for this page in your browser settings.':'Could not get location ('+err.message+'). Try again outdoors or with GPS on.'},
@@ -76,7 +76,7 @@ $('loc').onclick=()=>{const msg=$('locmsg');
 let map,marker;
 function syncMap(){if(!map)return;const la=parseFloat($('lat').value),lo=parseFloat($('lng').value);if(isNaN(la)||isNaN(lo))return;marker.setLatLng([la,lo]);map.setView([la,lo],Math.max(map.getZoom(),15))}
 async function setPoint(la,lo){$('lat').value=la.toFixed(6);$('lng').value=lo.toFixed(6);marker.setLatLng([la,lo]);const mm=$('mapmsg');mm.textContent='Looking up the place name…';
- try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat='+la+'&lon='+lo);const j=await r.json();
+ try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=en&addressdetails=1&lat='+la+'&lon='+lo);const j=await r.json();
   if(j&&j.address){pick({...j,lat:la,lon:lo});mm.textContent='Spot selected. Check the place name and address, and edit if needed.';return}}catch(e){}
  mm.textContent='Spot selected, but the place name could not be fetched. Type it in.';render()}
 function initMap(){if(typeof L==='undefined'){$('mapmsg').textContent='Map could not load. Check your internet connection.';return}
@@ -90,7 +90,7 @@ function initMap(){if(typeof L==='undefined'){$('mapmsg').textContent='Map could
  ['lat','lng'].forEach(i=>$(i).addEventListener('change',syncMap))}
 $('go').onclick=search;$('q').onkeydown=e=>{if(e.key==='Enter')search()};
 async function search(){const q=$('q').value.trim();if(!q)return;const box=$('results');box.innerHTML='<div class="res">Searching…</div>';
- try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q='+encodeURIComponent(q));
+ try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&accept-language=en&addressdetails=1&limit=6&q='+encodeURIComponent(q));
   const j=await r.json();box.innerHTML='';if(!j.length){box.innerHTML='<div class="res">No results</div>';return}
   j.forEach(p=>{const d=document.createElement('div');d.className='res';d.textContent=p.display_name;d.onclick=()=>{pick(p);box.innerHTML=''};box.appendChild(d)})
  }catch(e){box.innerHTML='<div class="res">Search failed. Check your internet connection.</div>'}}
